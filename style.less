@@ -1,0 +1,37 @@
+/* Mixins */
+
+.opacity(@opacity: 0.5) {
+	-moz-opacity: @opacity;
+	-khtml-opacity: @opacity;
+	-webkit-opacity: @opacity;
+	opacity: @opacity;
+	@opperc: @opacity * 100;
+	-ms-filter: ~"progid:DXImageTransform.Microsoft.Alpha(opacity=@{opperc})";
+	filter: ~"alpha(opacity=@{opperc})";
+}
+
+/* Section LESS */
+
+.flowy-container{
+	height:300px;
+	img {
+		-webkit-border-radius: 10px;
+		-moz-border-radius: 10px;
+		-o-border-radius: 10px;
+		border-radius: 10px;
+		-moz-box-shadow: 0px 5px 5px #777;
+		-webkit-box-shadow: 0px 5px 5px #777;
+		box-shadow: 0px 5px 5px #777;
+	}
+	.selectedItem{
+		-moz-box-shadow: 0 4px 10px #0071BC;
+		-webkit-box-shadow: 0 4px 10px #0071BC;
+		box-shadow: 0 4px 10px #0071BC;
+		border:1px solid #0071BC;
+	}
+}
+
+.itemTitle{
+	padding-top:30px;
+	font-weight: bold;
+}
