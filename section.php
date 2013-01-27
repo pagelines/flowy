@@ -3,11 +3,11 @@
 	Section: Flowy
 	Author: Aleksander Hansson
 	Author URI: http://ahansson.com
-	Demo: http://beefy.ahansson.com
+	Demo: http://flowy.ahansson.com
 	Version: 1.0
 	Description: 
 	Class Name: PageLinesFlowy
-	Workswith: templates, main
+	Workswith: templates, main, sidebar1, sidebar2, sidebar_wrap, header, footer, morefoot
 	Cloning: true
 */
 
