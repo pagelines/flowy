@@ -5,7 +5,7 @@
 	Author URI: http://ahansson.com
 	Demo: http://flowy.ahansson.com
 	Version: 1.0
-	Description: Flowy Slider is a jQuery slider that is great for showing multiple images on your site. Flowy Slider is inspired by Apple's Coverflow functions known from multiple devices and apps from the electronic giant. Flowy Slider comes with a number of options including custom describtions, ALT describtions for images etc. You can clone Flowy Slider and have it as many places on your site as you want! Flowy Slider is beautiful responsive as well and supports up to 30 images.
+	Description: Flowy Slider is a responsive jQuery slider.
 	Class Name: PageLinesFlowy
 	Workswith: templates, main
 	Cloning: true
