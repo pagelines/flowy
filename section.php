@@ -4,51 +4,15 @@
 	Author: Aleksander Hansson
 	Author URI: http://ahansson.com
 	Demo: http://flowy.ahansson.com
-	Version: 1.0
-	Description: Flowy Slider is a responsive jQuery slider.
-	Class Name: PageLinesFlowy
+	Version: 1.2
+	Description: Flowy Slider is a responsive jQuery slider, which is acting like iTunes Coverflow.
+	Class Name: Flowy
 	Workswith: templates, main
 	Cloning: true
+	v3: true
 */
 
-/**
- * PageLines Flowy
- *
- * @package PageLines Framework
- * @author Aleksander Hansson
- */
-
-
-
-class PageLinesFlowy extends PageLinesSection {
-
-	/*
-
-function section_persistent(){
-
-	add_filter( 'pless_vars', 'pl_counter_less');
-
-	function pl_beefy_less( $constants ){
-
-		$countdown_background_color = (ploption('countdown-background-color')) ? ploption('countdown-background-color') : '#1568AD';
-		$countdown_label_color = (ploption('countdown-label-color')) ? ploption('countdown-label-color') : '#000000';
-		$countdown_text_color = (ploption('countdown-text-color')) ? ploption('countdown-text-color') : '#ffffff';
-
-
-		$newvars = array(
-
-			'countdownbackgroundcolor' => $countdown_background_color ,
-			'countdownlabelcolor' => $countdown_label_color ,
-			'countdowntextcolor' => $countdown_text_color
-
-		);
-
-		$lessvars = array_merge($newvars, $constants);
-		return $lessvars;
-	}
-
-}
-*/
+class Flowy extends PageLinesSection {
 
 	var $default_limit = 4;
 
@@ -62,103 +26,115 @@ function section_persistent(){
 
 	}
 
-	function section_head( $clone_id ) {
+	function section_head() {
+
+		$clone_id = $this->get_the_id();
 
 		$prefix = ( $clone_id != '' ) ? 'Clone_'.$clone_id : '';
 
-?>
-		<script type="text/javascript">
-			jQuery(document).ready(function($){
-				$('#flowy<?php echo $prefix; ?>').coverscroll({
-    				titleclass:'itemTitle', // class name of the element containing the item title
-    				selectedclass:'selectedItem', // class name of the selected item
-    				scrollactive:false, // scroll functionality switch
-    				step:{ // compressed items on the side are steps
-    					limit:4, // how many steps should be shown on each side
-    					width:8, // how wide is the visible section of the step in pixels
-    					scale:true // scale down steps
-    				},
-    				bendamount:2, // amount of "bending" of the CoverScroll (values 0.1 to 1 bend down, -0.1 to -1 bend up, 2 is straight (no bending), 1.5 sligtly bends down)
-  					movecallback:function(item){} // callback function triggered after click on an item - parameter is the item's jQuery object
-  				});
+		?>
+			<script type="text/javascript">
+				jQuery(document).ready(function($){
+					$('#flowy<?php echo $prefix; ?>').coverscroll({
+	    				titleclass:'itemTitle', // class name of the element containing the item title
+	    				selectedclass:'selectedItem', // class name of the selected item
+	    				scrollactive:false, // scroll functionality switch
+	    				step:{ // compressed items on the side are steps
+	    					limit:4, // how many steps should be shown on each side
+	    					width:8, // how wide is the visible section of the step in pixels
+	    					scale:true // scale down steps
+	    				},
+	    				bendamount:2, // amount of "bending" of the CoverScroll (values 0.1 to 1 bend down, -0.1 to -1 bend up, 2 is straight (no bending), 1.5 sligtly bends down)
+	  					movecallback:function(item){} // callback function triggered after click on an item - parameter is the item's jQuery object
+	  				});
 
-				$(document.documentElement).keyup(function (event) {
-				    var direction = null;
+					$(document.documentElement).keyup(function (event) {
+					    var direction = null;
 
-				    // handle cursor keys
-				    if (event.keyCode == 37) {
-				      	// go left
-				      	direction = 'prev';
-				    } else if (event.keyCode == 39) {
-				      	// go right
-				      	direction = 'next';
-				    }
+					    // handle cursor keys
+					    if (event.keyCode == 37) {
+					      	// go left
+					      	direction = 'prev';
+					    } else if (event.keyCode == 39) {
+					      	// go right
+					      	direction = 'next';
+					    }
 
-				    if (direction != null) {
-				      	$('#flowy img.selectedItem')[direction]().click();
-				    }
+					    if (direction != null) {
+					      	$('#flowy img.selectedItem')[direction]().click();
+					    }
+					});
+
 				});
-
-			});
-		</script>
-	<?php
+			</script>
+		<?php
 
 	}
 
-	function section_template( $clone_id ) {
+	function section_template( ) {
+
+		$clone_id = $this->get_the_id();
 
 		$prefix = ( $clone_id != '' ) ? 'Clone_'.$clone_id : '';
 
-?>
+		?>
 
-		<div class="flowy-container">
-			<div id="flowy<?php echo $prefix; ?>" style="height:300px;">
+			<div class="flowy-container">
+				<div id="flowy<?php echo $prefix; ?>" style="height:300px;">
 					<?php
 
-		$flows = ( ploption( 'flowy_flows', $this->oset ) ) ? ploption( 'flowy_flows', $this->oset ) : $this->default_limit;
+						$flows = ( $this->opt( 'flowy_flows', $this->oset ) ) ? $this->opt( 'flowy_flows', $this->oset ) : $this->default_limit;
 
-		$output = '';
-		for ( $i = 1; $i <= $flows; $i++ ) {
+						$output = '';
 
-			if ( ploption( 'flowy_image_'.$i, $this->oset ) ) {
+						for ( $i = 1; $i <= $flows; $i++ ) {
 
-				$the_desc = ploption( 'flowy_desc_'.$i, $this->tset );
+							if ( $this->opt( 'flowy_image_'.$i, $this->oset ) ) {
 
-				$img_alt = ploption( 'flowy_alt_'.$i, $this->tset );
+								$the_desc = $this->opt( 'flowy_desc_'.$i, $this->tset );
 
-				$img = sprintf( '<img desc=\'%s\' src="%s" alt="%s"/>', $the_desc, ploption( 'flowy_image_'.$i, $this->oset ), $img_alt );
+								$img_alt = $this->opt( 'flowy_alt_'.$i, $this->tset );
 
-				$output .= $img;
-			}
-		}
+								$img = sprintf( '<img desc=\'%s\' src="%s" alt="%s"/>', $the_desc, $this->opt( 'flowy_image_'.$i, $this->oset ), $img_alt );
 
-		if ( $output == '' ) {
-			$this->do_defaults();
-		} else {
-			echo $output;
-		}
+								$output .= $img;
+							}
+						}
 
-?>
+						if ( $output == '' ) {
+
+							$this->do_defaults();
+
+						} else {
+
+							echo $output;
+						}
+
+					?>
+
+				</div>
+
 			</div>
 
-	<?php }
+		<?php
+	}
 
 	function do_defaults() {
 
-?>
-	<div class="flowy-container">
-		<div id="flowy" style="height:300px;">
-			<?php printf( '<img desc=\'<a href="http://pagelines.com/store/sections">Title #1: This title have a link</a>\' src="%s"/>', $this->base_url.'/img/1.png' ); ?>
-			<?php printf( '<img desc=\'Title #2: This title does not have a link\' src="%s"/>', $this->base_url.'/img/2.png' ); ?>
-			<?php printf( '<img desc=\'Title #3: This title does not have a link, but it is a title and it is a very long title for an image\' src="%s"/>', $this->base_url.'/img/3.png' ); ?>
-			<?php printf( '<img desc=\'Title #4: Try using your left and right key on your keyboard to control the slider!\' src="%s"/>', $this->base_url.'/img/4.png' ); ?>
-			<?php printf( '<img desc=\'Title #5: This is the fifth image in the slider\' src="%s"/>', $this->base_url.'/img/5.png' ); ?>
-			<?php printf( '<img desc=\'Title #6: My name is Aleksander Hansson and I am a PageLines developer\' src="%s"/>', $this->base_url.'/img/6.png' ); ?>
-			<?php printf( '<img desc=\'Title #7: Last image in the slider does not have a describtion.\' src="%s"/>', $this->base_url.'/img/7.png' ); ?>
-			<?php printf( '<img desc=\'\' src="%s"/>', $this->base_url.'/img/8.png' ); ?>
-		</div>
-	</div>
-	<?php
+		?>
+			<div class="flowy-container">
+				<div id="flowy" style="height:300px;">
+					<?php printf( '<img desc=\'<a href="http://pagelines.com/store/sections">Title #1: This title have a link</a>\' src="%s"/>', $this->base_url.'/img/1.png' ); ?>
+					<?php printf( '<img desc=\'Title #2: This title does not have a link\' src="%s"/>', $this->base_url.'/img/2.png' ); ?>
+					<?php printf( '<img desc=\'Title #3: This title does not have a link, but it is a title and it is a very long title for an image\' src="%s"/>', $this->base_url.'/img/3.png' ); ?>
+					<?php printf( '<img desc=\'Title #4: Try using your left and right key on your keyboard to control the slider!\' src="%s"/>', $this->base_url.'/img/4.png' ); ?>
+					<?php printf( '<img desc=\'Title #5: This is the fifth image in the slider\' src="%s"/>', $this->base_url.'/img/5.png' ); ?>
+					<?php printf( '<img desc=\'Title #6: My name is Aleksander Hansson and I am a PageLines developer\' src="%s"/>', $this->base_url.'/img/6.png' ); ?>
+					<?php printf( '<img desc=\'Title #7: Last image in the slider does not have a describtion.\' src="%s"/>', $this->base_url.'/img/7.png' ); ?>
+					<?php printf( '<img desc=\'\' src="%s"/>', $this->base_url.'/img/8.png' ); ?>
+				</div>
+			</div>
+		<?php
 
 	}
 
@@ -172,17 +148,17 @@ function section_persistent(){
 			'count_start' => 4,
 			'count_number' => 30,
 			'default'  => '4',
-			'inputlabel'  => __( 'Number of Images to Configure', 'pagelines' ),
-			'title'   => __( 'Number of images', 'pagelines' ),
-			'shortexp'   => __( 'Enter the number of Flowy images. <strong>Minimum is 4</strong>', 'pagelines' ),
-			'exp'    => __( "This number will be used to generate slides and option setup.", 'pagelines' ),
+			'inputlabel'  => __( 'Number of Images to Configure', 'Flowy' ),
+			'title'   => __( 'Number of images', 'Flowy' ),
+			'shortexp'   => __( 'Enter the number of Flowy images. <strong>Minimum is 4</strong>', 'Flowy' ),
+			'exp'    => __( "This number will be used to generate slides and option setup.", 'Flowy' ),
 		);
 
 		global $post_ID;
 
 		$oset = array( 'post_id' => $post_ID, 'clone_id' => $settings['clone_id'], 'type' => $settings['type'] );
 
-		$slides = ( ploption( 'flowy_flows', $oset ) ) ? ploption( 'flowy_flows', $oset ) : $this->default_limit;
+		$slides = ( $this->opt( 'flowy_flows', $oset ) ) ? $this->opt( 'flowy_flows', $oset ) : $this->default_limit;
 
 		for ( $i = 1; $i <= $slides; $i++ ) {
 
@@ -190,28 +166,28 @@ function section_persistent(){
 				'type'    => 'multi_option',
 				'selectvalues' => array(
 					'flowy_image_'.$i  => array(
-						'inputlabel'  => __( 'Slide Image', 'pagelines' ),
+						'inputlabel'  => __( 'Slide Image', 'Flowy' ),
 						'type'   => 'image_upload'
 					),
 					'flowy_alt_'.$i  => array(
-						'inputlabel' => __( 'Image ALT tag', 'pagelines' ),
+						'inputlabel' => __( 'Image ALT tag', 'Flowy' ),
 						'type'   => 'text'
 					),
 					'flowy_desc_'.$i  => array(
-						'inputlabel' => __( 'Slide Description', 'pagelines' ),
+						'inputlabel' => __( 'Slide Description', 'Flowy' ),
 						'type'   => 'text'
 					),
 				),
-				'title'   => __( 'Flowy Slide ', 'pagelines' ) . $i,
-				'shortexp'   => __( 'Setup options for slide number ', 'pagelines' ) . $i,
-				'exp'   => __( 'For best results all images in the slider should have the same dimensions.', 'pagelines' )
+				'title'   => __( 'Flowy Slide ', 'Flowy' ) . $i,
+				'shortexp'   => __( 'Setup options for slide number ', 'Flowy' ) . $i,
+				'exp'   => __( 'For best results all images in the slider should have the same dimensions.', 'Flowy' )
 			);
 
 		}
 
 		$metatab_settings = array(
 			'id'   => 'flowy_options',
-			'name'   => __( 'Flowy', 'pagelines' ),
+			'name'   => 'Flowy',
 			'icon'   => $this->icon,
 			'clone_id' => $settings['clone_id'],
 			'active' => $settings['active']
