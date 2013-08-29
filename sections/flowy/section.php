@@ -6,9 +6,9 @@
 	Demo: http://flowy.ahansson.com
 	Description: Flowy Slider is a responsive jQuery slider, which is acting like iTunes Coverflow.
 	Class Name: Flowy
-	Workswith: templates, main
 	Cloning: true
 	v3: true
+	Filter: slider
 */
 
 class Flowy extends PageLinesSection {
