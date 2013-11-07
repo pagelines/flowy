@@ -76,27 +76,44 @@ class Flowy extends PageLinesSection {
 
 		$prefix = ( $clone_id != '' ) ? 'Clone_'.$clone_id : '';
 
+		// The boxes
+		$flowy_array = $this->opt('flowy_array');
+
+		$format_upgrade_mapping = array(
+			'image'	=> 'flowy_image_%s',
+			'alt'	=> 'flowy_alt_%s',
+			'desc'	=> 'flowy_desc_%s'
+		);
+
+		$flowy_array = $this->upgrade_to_array_format( 'flowy_array', $flowy_array, $format_upgrade_mapping, $this->opt('flowy_flows'));
+
+		// must come after upgrade
+		if( !$flowy_array || $flowy_array == 'false' || !is_array($flowy_array) ){
+			$flowy_array = array( array(), array(), array(), array() );
+		}
+
 		?>
 
 			<div class="flowy-container">
 				<div id="flowy<?php echo $prefix; ?>" style="height:300px;">
 					<?php
 
-						$flows = ( $this->opt( 'flowy_flows', $this->oset ) ) ? $this->opt( 'flowy_flows', $this->oset ) : $this->default_limit;
-
 						$output = '';
 
-						for ( $i = 1; $i <= $flows; $i++ ) {
+						if( is_array($flowy_array) ){
 
-							if ( $this->opt( 'flowy_image_'.$i, $this->oset ) ) {
+							$slides = count( $flowy_array );
 
-								$the_desc = $this->opt( 'flowy_desc_'.$i, $this->tset );
+							foreach( $flowy_array as $slide ){
 
-								$img_alt = $this->opt( 'flowy_alt_'.$i, $this->tset );
+								if ( pl_array_get( 'image', $slide ) ) {
 
-								$img = sprintf( '<img desc=\'%s\' src="%s" alt="%s"/>', $the_desc, $this->opt( 'flowy_image_'.$i, $this->oset ), $img_alt );
+									$the_desc = pl_array_get( 'desc', $slide );
+									$img_alt = pl_array_get( 'alt', $slide );
+									$img = sprintf( '<img desc=\'%s\' src="%s" alt="%s"/>', $the_desc, pl_array_get( 'image', $slide ), $img_alt );
 
-								$output .= $img;
+									$output .= $img;
+								}
 							}
 						}
 
@@ -137,62 +154,66 @@ class Flowy extends PageLinesSection {
 
 	}
 
-	function section_optionator( $settings ) {
-		$settings = wp_parse_args( $settings, $this->optionator_default );
+	function section_opts(){
 
-		$array = array();
+		$options = array();
 
-		$array['flowy_flows'] = array(
-			'type'    => 'count_select',
-			'count_start' => 4,
-			'count_number' => 30,
-			'default'  => '4',
-			'inputlabel'  => __( 'Number of Images to Configure', 'Flowy' ),
-			'title'   => __( 'Number of images', 'Flowy' ),
-			'shortexp'   => __( 'Enter the number of Flowy images. <strong>Minimum is 4</strong>', 'Flowy' ),
-			'exp'    => __( "This number will be used to generate slides and option setup.", 'Flowy' ),
+		$how_to_use = __( '
+		<strong>Read the instructions below before asking for additional help:</strong>
+		</br></br>
+		<strong>1.</strong> In the frontend editor, drag the Flowy section to a template of your choice.
+		</br></br>
+		<strong>2.</strong> Edit settings for Flowy slides.
+		</br></br>
+		<strong>3.</strong> When you are done, hit "Publish" to see changes.
+		</br></br>
+		<div class="row zmb">
+				<div class="span6 tac zmb">
+					<a class="btn btn-info" href="http://forum.pagelines.com/71-products-by-aleksander-hansson/" target="_blank" style="padding:4px 0 4px;width:100%"><i class="icon-ambulance"></i>          Forum</a>
+				</div>
+				<div class="span6 tac zmb">
+					<a class="btn btn-info" href="http://betterdms.com" target="_blank" style="padding:4px 0 4px;width:100%"><i class="icon-align-justify"></i>          Better DMS</a>
+				</div>
+			</div>
+			<div class="row zmb" style="margin-top:4px;">
+				<div class="span12 tac zmb">
+					<a class="btn btn-success" href="http://shop.ahansson.com" target="_blank" style="padding:4px 0 4px;width:100%"><i class="icon-shopping-cart" ></i>          My Shop</a>
+				</div>
+			</div>
+		', 'flowy' );
+
+		$options[] = array(
+			'key' => 'flowy_help',
+			'type'     => 'template',
+			'template'      => do_shortcode( $how_to_use ),
+			'title' =>__( 'How to use:', 'flowy' ) ,
 		);
 
-		global $post_ID;
-
-		$oset = array( 'post_id' => $post_ID, 'clone_id' => $settings['clone_id'], 'type' => $settings['type'] );
-
-		$slides = ( $this->opt( 'flowy_flows', $oset ) ) ? $this->opt( 'flowy_flows', $oset ) : $this->default_limit;
-
-		for ( $i = 1; $i <= $slides; $i++ ) {
-
-			$array['flowy_slide_'.$i] = array(
-				'type'    => 'multi_option',
-				'selectvalues' => array(
-					'flowy_image_'.$i  => array(
-						'inputlabel'  => __( 'Slide Image', 'Flowy' ),
-						'type'   => 'image_upload'
-					),
-					'flowy_alt_'.$i  => array(
-						'inputlabel' => __( 'Image ALT tag', 'Flowy' ),
-						'type'   => 'text'
-					),
-					'flowy_desc_'.$i  => array(
-						'inputlabel' => __( 'Slide Description', 'Flowy' ),
-						'type'   => 'text'
-					),
+		$options[] = array(
+			'key'		=> 'flowy_array',
+	    	'type'		=> 'accordion',
+			'title'		=> __('Flowy Setup', 'flowy'),
+			'post_type'	=> __('Flowy Slide', 'flowy'),
+			'opts'	=> array(
+				array(
+					'key'	=> 'image',
+					'label' => __( 'Slide Image', 'flowy' ),
+					'type'  => 'image_upload'
 				),
-				'title'   => __( 'Flowy Slide ', 'Flowy' ) . $i,
-				'shortexp'   => __( 'Setup options for slide number ', 'Flowy' ) . $i,
-				'exp'   => __( 'For best results all images in the slider should have the same dimensions.', 'Flowy' )
-			);
-
-		}
-
-		$metatab_settings = array(
-			'id'   => 'flowy_options',
-			'name'   => 'Flowy',
-			'icon'   => $this->icon,
-			'clone_id' => $settings['clone_id'],
-			'active' => $settings['active']
+				array(
+					'key'	=> 'alt',
+					'label' => __( 'Image ALT tag', 'flowy' ),
+					'type'   => 'text'
+				),
+				array(
+					'key'	=> 'desc',
+					'label' => __( 'Slide Description', 'flowy' ),
+					'type'   => 'text'
+				),
+			)
 		);
 
-		register_metatab( $metatab_settings, $array );
+		return $options;
 
 	}
 
